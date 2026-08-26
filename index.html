@@ -866,32 +866,23 @@
   }
 
   function openBitApp() {
-    // Bit deep link: opens Bit app to send to phone number
-    window.location.href = 'bit://pay?phone=' + PHONE;
-    // Fallback after short delay — open app store if no app
-    setTimeout(() => {
-      const isAndroid = /android/i.test(navigator.userAgent);
-      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-      if (isIOS) {
-        window.location.href = 'https://apps.apple.com/il/app/bit/id1524592228';
-      } else if (isAndroid) {
-        window.location.href = 'https://play.google.com/store/apps/details?id=com.bnhp.payments.bitApp';
-      }
-    }, 1500);
+    const isAndroid = /android/i.test(navigator.userAgent);
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (isAndroid) {
+      window.open('https://play.google.com/store/apps/details?id=com.bnhp.payments.bitApp', '_blank');
+    } else {
+      // iOS + desktop: App Store page opens in new tab, user stays on landing page
+      window.open('https://apps.apple.com/il/app/bit/id1524592228', '_blank');
+    }
   }
 
   function openPayboxApp() {
-    // Paybox deep link
-    window.location.href = 'payboxapp://pay?phone=' + PHONE;
-    setTimeout(() => {
-      const isAndroid = /android/i.test(navigator.userAgent);
-      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-      if (isIOS) {
-        window.location.href = 'https://apps.apple.com/il/app/paybox/id966408400';
-      } else if (isAndroid) {
-        window.location.href = 'https://play.google.com/store/apps/details?id=com.payboxapp';
-      }
-    }, 1500);
+    const isAndroid = /android/i.test(navigator.userAgent);
+    if (isAndroid) {
+      window.open('https://play.google.com/store/apps/details?id=com.payboxapp', '_blank');
+    } else {
+      window.open('https://apps.apple.com/il/app/paybox-pay-send-money/id966408400', '_blank');
+    }
   }
 </script>
 </body>
