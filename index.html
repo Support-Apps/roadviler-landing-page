@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoadViler — ניהול נסיעות חכם</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=EB+Garamond:wght@400;500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #A88A2E;
+    --accent2: #C9A84C;
+    --gold: #C9A84C;
+    --cream: #FFFBF7;
+    --text: #2D2D2D;
+    --text-light: #8A8A8A;
+    --white: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Cormorant Garamond', 'Segoe UI', Tahoma, serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.7;
+    direction: rtl;
+  }
+
+  /* ── BSD FIXED ── */
+  .bsd-fixed {
+    position: fixed;
+    top: 14px;
+    right: 22px;
+    z-index: 2000;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.95rem;
+    color: #A88A2E;
+    letter-spacing: 1px;
+    pointer-events: none;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 80px 60px 100px;
+    position: relative;
+    overflow: hidden;
+    background: var(--cream);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: -80px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-content { max-width: 680px; position: relative; z-index: 2; }
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+    border-bottom: 1px solid rgba(201,168,76,0.4);
+    padding-bottom: 8px;
+  }
+  .hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: 3.4rem;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+  }
+  .hero-title .highlight {
+    color: var(--gold);
+    font-style: italic;
+  }
+  .hero-desc {
+    font-size: 1.18rem;
+    color: var(--text-light);
+    margin-bottom: 44px;
+    line-height: 1.85;
+    max-width: 560px;
+  }
+  .hero-cta-group { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+  .cta-button {
+    display: inline-block;
+    background: var(--gold);
+    color: white;
+    padding: 15px 40px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+  }
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(201,168,76,0.3);
+  }
+  .cta-outline {
+    display: inline-block;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 15px 32px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-family: 'Cormorant Garamond', serif;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+    cursor: pointer;
+    background: transparent;
+  }
+  .cta-outline:hover {
+    background: var(--gold);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* hero stats */
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    margin-top: 56px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(201,168,76,0.2);
+  }
+  .stat-item { text-align: right; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.1rem;
+    color: var(--gold);
+    font-weight: 400;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ── MARQUEE ── */
+  .marquee {
+    background: #F5EDD4;
+    padding: 14px 0;
+    overflow: hidden;
+  }
+  .marquee-inner {
+    display: flex;
+    animation: marqueeScroll 40s linear infinite;
+    width: max-content;
+  }
+  .marquee-item {
+    white-space: nowrap;
+    padding: 0 36px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #A88A2E;
+    opacity: 0.7;
+  }
+  .marquee-item .dot { color: var(--gold); margin: 0 4px; }
+  @keyframes marqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ── FEATURES ── */
+  .features {
+    padding: 110px 60px;
+    background: #FFFDF9;
+  }
+  .section-label {
+    text-align: center;
+    font-size: 0.78rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+    font-weight: 700;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 70px;
+    font-weight: 400;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 36px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .feature-card {
+    padding: 36px 32px;
+    border: 1px solid rgba(201,168,76,0.15);
+    background: var(--cream);
+    text-align: right;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 3px; height: 0;
+    background: var(--gold);
+    transition: height 0.3s;
+  }
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(201,168,76,0.12);
+  }
+  .feature-card:hover::before { height: 100%; }
+  .feature-icon {
+    font-size: 2.2rem;
+    margin-bottom: 18px;
+    display: block;
+  }
+  .feature-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    color: var(--text);
+    margin-bottom: 12px;
+    font-weight: 400;
+  }
+  .feature-desc {
+    font-size: 0.98rem;
+    color: var(--text-light);
+    line-height: 1.75;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .how-it-works {
+    padding: 110px 60px;
+    background: var(--cream);
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .step {
+    text-align: center;
+    padding: 30px 20px;
+    position: relative;
+  }
+  .step::after {
+    content: '←';
+    position: absolute;
+    top: 38px;
+    left: -10px;
+    font-size: 1.5rem;
+    color: rgba(201,168,76,0.35);
+  }
+  .step:last-child::after { display: none; }
+  .step-num {
+    width: 54px; height: 54px;
+    background: var(--gold);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    margin: 0 auto 20px;
+  }
+  .step-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 10px;
+    font-weight: 400;
+  }
+  .step-desc {
+    font-size: 0.93rem;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  /* ── PRICING ── */
+  .pricing {
+    padding: 110px 60px;
+    text-align: center;
+    background: #FFFDF9;
+  }
+  .price-box {
+    max-width: 520px;
+    margin: 0 auto;
+    border: 1px solid #E8D48E;
+    padding: 60px 50px;
+    background: var(--cream);
+    position: relative;
+  }
+  .price-badge {
+    position: absolute;
+    top: -16px;
+    right: 50%;
+    transform: translateX(50%);
+    background: var(--gold);
+    color: white;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 18px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .price-tag {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    color: var(--gold);
+    margin: 20px 0 10px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 4px;
+    line-height: 1;
+  }
+  .price-tag sup { font-size: 1.6rem; padding-top: 10px; }
+  .price-sub {
+    color: var(--text-light);
+    margin-bottom: 36px;
+    font-size: 0.95rem;
+    line-height: 1.8;
+  }
+  .price-features {
+    list-style: none;
+    margin-bottom: 40px;
+    text-align: right;
+  }
+  .price-features li {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.12);
+    font-size: 0.97rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .price-features li .check {
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  /* ── PAYMENT BUTTONS ── */
+  .payment-section {
+    margin-top: 12px;
+  }
+  .payment-label {
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 18px;
+    font-weight: 700;
+  }
+  .payment-buttons {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  /* BIT button */
+  .pay-btn-bit {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #EA1A8D;
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    border-radius: 0;
+    min-width: 190px;
+    justify-content: center;
+  }
+  .pay-btn-bit:hover {
+    background: #c71278;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(234,26,141,0.3);
+  }
+  .pay-btn-bit .btn-icon {
+    width: 26px; height: 26px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .pay-btn-bit .btn-icon svg { width: 16px; height: 16px; }
+
+  /* Paybox button */
+  .pay-btn-paybox {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #6C3BE4;
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    border-radius: 0;
+    min-width: 190px;
+    justify-content: center;
+  }
+  .pay-btn-paybox:hover {
+    background: #5528cc;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(108,59,228,0.3);
+  }
+  .pay-btn-paybox .btn-icon {
+    width: 26px; height: 26px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .pay-btn-paybox .btn-icon svg { width: 15px; height: 15px; }
+
+  /* payment divider */
+  .payment-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0 10px;
+    color: var(--text-light);
+    font-size: 0.82rem;
+    letter-spacing: 1px;
+  }
+  .payment-divider::before,
+  .payment-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(201,168,76,0.2);
+  }
+
+  /* payment popup */
+  .pay-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+  }
+  .pay-modal.open { display: flex; }
+  .pay-panel {
+    background: white;
+    padding: 44px 40px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .pay-panel .close-btn {
+    position: absolute;
+    top: 14px; left: 18px;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: var(--text-light);
+    line-height: 1;
+  }
+  .pay-panel .pay-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    font-weight: 400;
+  }
+  .pay-panel .pay-logo.bit { color: #EA1A8D; }
+  .pay-panel .pay-logo.paybox { color: #6C3BE4; }
+  .pay-panel .pay-desc {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-bottom: 28px;
+    line-height: 1.7;
+  }
+  .pay-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--text);
+    letter-spacing: 3px;
+    background: var(--cream);
+    padding: 18px 24px;
+    border: 1px solid rgba(201,168,76,0.25);
+    margin-bottom: 20px;
+    display: block;
+    direction: ltr;
+  }
+  .copy-number-btn {
+    background: var(--gold);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  .copy-number-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .open-app-btn {
+    display: block;
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    text-decoration: underline;
+    cursor: pointer;
+    background: none;
+    border: none;
+    width: 100%;
+    padding: 8px 0;
+    letter-spacing: 0.5px;
+  }
+  .open-app-btn:hover { color: var(--gold); }
+  .copy-success {
+    font-size: 0.82rem;
+    color: #22a06b;
+    margin-top: 8px;
+    display: none;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 60px;
+    text-align: center;
+    background: #F5F1ED;
+    color: var(--text-light);
+  }
+  footer .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: #A88A2E;
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+  }
+  footer .footer-logo span { color: var(--gold); }
+  footer p { font-size: 0.88rem; line-height: 1.9; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .navbar { padding: 14px 18px; }
+    .hero { padding: 60px 22px 80px; }
+    .hero-title { font-size: 2.2rem !important; }
+    .hero-stats { gap: 28px; flex-wrap: wrap; }
+    .features { padding: 60px 20px; }
+    .features-grid { grid-template-columns: 1fr; gap: 20px; }
+    .how-it-works { padding: 60px 20px; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    .step::after { display: none; }
+    .pricing { padding: 60px 20px; }
+    .price-box { padding: 40px 24px; }
+    .payment-buttons { flex-direction: column; }
+    .pay-btn-bit, .pay-btn-paybox { width: 100%; }
+    footer { padding: 40px 22px; }
+    .section-title { font-size: 2.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BSD FIXED -->
+<div class="bsd-fixed">בס"ד</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <span class="hero-eyebrow">✦ לחברות הסעה פרטיות ✦</span>
+    <h1 class="hero-title">
+      מסלול חכם,<br>
+      <span class="highlight">חיסכון אמיתי</span>
+    </h1>
+    <p class="hero-desc">
+      RoadViler מסדרת את כתובות הנוסעים לפי מיקום גאוגרפי — אוטומטית.
+      פחות קילומטרים, פחות זמן, פחות דלק. הפתרון המשתלם לחברות הסעה פרטיות.
+    </p>
+    <div class="hero-cta-group">
+      <a href="#pricing" class="cta-button">התחל עכשיו</a>
+      <a href="#features" class="cta-outline">גלה יותר</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-inner">
+    <span class="marquee-item">✦ מעקב נסיעות <span class="dot">·</span></span>
+    <span class="marquee-item">✦ דוחות אוטומטיים <span class="dot">·</span></span>
+    <span class="marquee-item">✦ קילומטראז' חכם <span class="dot">·</span></span>
+    <span class="marquee-item">✦ יצוא לאקסל <span class="dot">·</span></span>
+    <span class="marquee-item">✦ ניהול הוצאות <span class="dot">·</span></span>
+    <span class="marquee-item">✦ תמיכה עברית מלאה <span class="dot">·</span></span>
+    <span class="marquee-item">✦ ממשק ידידותי <span class="dot">·</span></span>
+    <span class="marquee-item">✦ מעקב נסיעות <span class="dot">·</span></span>
+    <span class="marquee-item">✦ דוחות אוטומטיים <span class="dot">·</span></span>
+    <span class="marquee-item">✦ קילומטראז' חכם <span class="dot">·</span></span>
+    <span class="marquee-item">✦ יצוא לאקסל <span class="dot">·</span></span>
+    <span class="marquee-item">✦ ניהול הוצאות <span class="dot">·</span></span>
+    <span class="marquee-item">✦ תמיכה עברית מלאה <span class="dot">·</span></span>
+    <span class="marquee-item">✦ ממשק ידידותי <span class="dot">·</span></span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-label">מה מקבלים</div>
+  <h2 class="section-title">כל מה שצריך לנסיעה חכמה</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-icon">📍</span>
+      <h3 class="feature-title">הזנת כתובות פשוטה</h3>
+      <p class="feature-desc">מזינים את כתובת הנהג ואת כתובות הנוסעים — האפליקציה מטפלת בכל השאר.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🗺️</span>
+      <h3 class="feature-title">מיון לפי קואורדינטות</h3>
+      <p class="feature-desc">האפליקציה מסדרת את הכתובות אוטומטית לפי מיקום גאוגרפי — ללא חישוב ידני.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🚗</span>
+      <h3 class="feature-title">יציאה מהעיר</h3>
+      <p class="feature-desc">בחר במצב "יציאה מהעיר" — הכתובת הראשונה בסדר תהיה הקרובה ביותר לנהג, והמסלול ממשיך הלאה.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🏙️</span>
+      <h3 class="feature-title">כניסה לעיר</h3>
+      <p class="feature-desc">בחר במצב "כניסה לעיר" — הסדר מתהפך: מהכתובת הקרובה לכניסה, עד לזו הקרובה ביותר לנהג.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">⛽</span>
+      <h3 class="feature-title">חיסכון בדלק</h3>
+      <p class="feature-desc">מסלול מחושב נכון = פחות קילומטרים, פחות זמן בדרך, פחות הוצאות על דלק — כל נסיעה.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">💼</span>
+      <h3 class="feature-title">לחברות הסעה פרטיות</h3>
+      <p class="feature-desc">תוצאה מידית ומשתלמת לחברות המפעילות נהגים מדי יום — חיסכון בזמן ובעלויות התפעול.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works" id="how">
+  <div class="section-label">שלבים פשוטים</div>
+  <h2 class="section-title">איך מתחילים?</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3 class="step-title">הזן כתובת נהג</h3>
+      <p class="step-desc">מתחילים מכתובת הנהג — זו נקודת הייחוס לחישוב כל המסלול.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3 class="step-title">הזן כתובות נוסעים</h3>
+      <p class="step-desc">מוסיפים את כל כתובות הנוסעים — ללא סדר מסוים, האפליקציה תסדר הכל.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3 class="step-title">בחר כיוון נסיעה</h3>
+      <p class="step-desc">יציאה מהעיר או כניסה לעיר — לחיצה אחת משנה את כיוון המסלול כולו.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3 class="step-title">קבל מסלול מסודר</h3>
+      <p class="step-desc">האפליקציה מסדרת את הכתובות לפי קואורדינטות גאוגרפיות — מסלול אופטימלי, מיידית.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-label">השקעה חד-פעמית</div>
+  <h2 class="section-title">מחיר ישיר ופשוט</h2>
+  <div class="price-box">
+    <div class="price-badge">מחיר השקה</div>
+    <p style="color: var(--text-light); font-size: 1rem; margin-bottom: 8px;">RoadViler Pro</p>
+    <div class="price-tag">
+      <sup>₪</sup>197
+    </div>
+    <p class="price-sub">
+      תשלום חד-פעמי · הורדה מיידית · ללא דמי מנוי
+    </p>
+    <ul class="price-features">
+      <li><span class="check">✦</span> מיון כתובות לפי קואורדינטות גאוגרפיות</li>
+      <li><span class="check">✦</span> מצב יציאה מהעיר ומצב כניסה לעיר</li>
+      <li><span class="check">✦</span> הזנת כתובת נהג כנקודת ייחוס</li>
+      <li><span class="check">✦</span> חיסכון בדלק ובזמן נסיעה</li>
+      <li><span class="check">✦</span> מתאים לחברות הסעה פרטיות</li>
+      <li><span class="check">✦</span> תמיכה ישירה בוואטסאפ</li>
+    </ul>
+
+    <!-- PAYMENT SECTION -->
+    <div class="payment-section">
+      <p class="payment-label">בחרו אמצעי תשלום</p>
+      <div class="payment-buttons">
+        <!-- BIT -->
+        <button class="pay-btn-bit" onclick="openPayModal('bit')">
+          <span class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="#EA1A8D" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" fill="#EA1A8D"/>
+              <text x="12" y="16" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">bit</text>
+            </svg>
+          </span>
+          תשלום ב-Bit
+        </button>
+        <!-- PAYBOX -->
+        <button class="pay-btn-paybox" onclick="openPayModal('paybox')">
+          <span class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="#6C3BE4" xmlns="http://www.w3.org/2000/svg">
+              <rect width="24" height="24" rx="4" fill="#6C3BE4"/>
+              <text x="12" y="16" text-anchor="middle" fill="white" font-size="7" font-weight="bold" font-family="Arial">PAY</text>
+            </svg>
+          </span>
+          תשלום ב-PayBox
+        </button>
+      </div>
+      <div class="payment-divider">· העברה ישירה לנייד ·</div>
+      <p style="font-size:0.82rem; color:var(--text-light); line-height:1.6;">לאחר התשלום שלחו צילום מסך לוואטסאפ<br>ותקבלו את הקישור להורדה תוך שעה</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Road<span>Viler</span></div>
+  <p>© 2026 RoadViler — ניהול נסיעות חכם לאנשי מקצוע</p>
+  <p style="margin-top:10px; font-size:0.82rem;">תוכנה ישראלית · תמיכה בעברית · תשלום מאובטח</p>
+</footer>
+
+<!-- BIT MODAL -->
+<div class="pay-modal" id="bitModal">
+  <div class="pay-panel">
+    <button class="close-btn" onclick="closePayModal('bit')">×</button>
+    <div class="pay-logo bit">💳 Bit</div>
+    <p class="pay-desc">
+      פתחו את אפליקציית <strong>Bit</strong> בטלפון שלכם<br>
+      ושלחו תשלום למספר הבא:
+    </p>
+    <span class="pay-number" id="bitNumber">058-634-5351</span>
+    <button class="copy-number-btn" onclick="copyNumber('bit')">העתק מספר</button>
+    <button class="open-app-btn" onclick="openBitApp()">פתח ישירות ב-Bit ←</button>
+    <div class="copy-success" id="bitCopySuccess">✓ המספר הועתק!</div>
+    <p style="font-size:0.8rem; color:var(--text-light); margin-top:16px; line-height:1.6;">
+      לאחר התשלום שלחו צילום מסך בוואטסאפ<br>
+      ותקבלו את הקישור להורדה תוך שעה 🙏
+    </p>
+  </div>
+</div>
+
+<!-- PAYBOX MODAL -->
+<div class="pay-modal" id="payboxModal">
+  <div class="pay-panel">
+    <button class="close-btn" onclick="closePayModal('paybox')">×</button>
+    <div class="pay-logo paybox">📦 PayBox</div>
+    <p class="pay-desc">
+      פתחו את אפליקציית <strong>PayBox</strong> בטלפון שלכם<br>
+      ושלחו תשלום למספר הבא:
+    </p>
+    <span class="pay-number" id="payboxNumber">058-634-5351</span>
+    <button class="copy-number-btn" onclick="copyNumber('paybox')">העתק מספר</button>
+    <button class="open-app-btn" onclick="openPayboxApp()">פתח ישירות ב-PayBox ←</button>
+    <div class="copy-success" id="payboxCopySuccess">✓ המספר הועתק!</div>
+    <p style="font-size:0.8rem; color:var(--text-light); margin-top:16px; line-height:1.6;">
+      לאחר התשלום שלחו צילום מסך בוואטסאפ<br>
+      ותקבלו את הקישור להורדה תוך שעה 🙏
+    </p>
+  </div>
+</div>
+
+<script>
+  // SMOOTH SCROLL
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      const id = this.getAttribute('href').slice(1);
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  const PHONE = '0586345351';
+  const PHONE_DISPLAY = '058-634-5351';
+
+  function openPayModal(type) {
+    document.getElementById(type + 'Modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closePayModal(type) {
+    document.getElementById(type + 'Modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Close on backdrop click
+  document.querySelectorAll('.pay-modal').forEach(m => {
+    m.addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
+  });
+
+  function copyNumber(type) {
+    navigator.clipboard.writeText(PHONE).then(() => {
+      const el = document.getElementById(type + 'CopySuccess');
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 2500);
+    }).catch(() => {
+      // fallback
+      const input = document.createElement('input');
+      input.value = PHONE;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      const el = document.getElementById(type + 'CopySuccess');
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 2500);
+    });
+  }
+
+  function openBitApp() {
+    // Bit deep link: opens Bit app to send to phone number
+    window.location.href = 'bit://pay?phone=' + PHONE;
+    // Fallback after short delay — open app store if no app
+    setTimeout(() => {
+      const isAndroid = /android/i.test(navigator.userAgent);
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      if (isIOS) {
+        window.location.href = 'https://apps.apple.com/il/app/bit/id1524592228';
+      } else if (isAndroid) {
+        window.location.href = 'https://play.google.com/store/apps/details?id=com.bnhp.payments.bitApp';
+      }
+    }, 1500);
+  }
+
+  function openPayboxApp() {
+    // Paybox deep link
+    window.location.href = 'payboxapp://pay?phone=' + PHONE;
+    setTimeout(() => {
+      const isAndroid = /android/i.test(navigator.userAgent);
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      if (isIOS) {
+        window.location.href = 'https://apps.apple.com/il/app/paybox/id966408400';
+      } else if (isAndroid) {
+        window.location.href = 'https://play.google.com/store/apps/details?id=com.payboxapp';
+      }
+    }, 1500);
+  }
+</script>
+</body>
+</html>
