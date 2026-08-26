@@ -846,6 +846,24 @@
     });
   });
 
+  function openBitApp() {
+    const isAndroid = /android/i.test(navigator.userAgent);
+    if (isAndroid) {
+      window.open('https://play.google.com/store/apps/details?id=com.bnhp.payments.bitApp', '_blank');
+    } else {
+      window.open('https://apps.apple.com/il/app/bit/id1524592228', '_blank');
+    }
+  }
+
+  function openPayboxApp() {
+    const isAndroid = /android/i.test(navigator.userAgent);
+    if (isAndroid) {
+      window.open('https://play.google.com/store/apps/details?id=com.payboxapp', '_blank');
+    } else {
+      window.open('https://apps.apple.com/il/app/paybox-pay-send-money/id966408400', '_blank');
+    }
+  }
+
   function copyNumber(type) {
     navigator.clipboard.writeText(PHONE).then(() => {
       const el = document.getElementById(type + 'CopySuccess');
@@ -865,25 +883,7 @@
     });
   }
 
-  function openBitApp() {
-    const isAndroid = /android/i.test(navigator.userAgent);
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    if (isAndroid) {
-      window.open('https://play.google.com/store/apps/details?id=com.bnhp.payments.bitApp', '_blank');
-    } else {
-      // iOS + desktop: App Store page opens in new tab, user stays on landing page
-      window.open('https://apps.apple.com/il/app/bit/id1524592228', '_blank');
-    }
-  }
 
-  function openPayboxApp() {
-    const isAndroid = /android/i.test(navigator.userAgent);
-    if (isAndroid) {
-      window.open('https://play.google.com/store/apps/details?id=com.payboxapp', '_blank');
-    } else {
-      window.open('https://apps.apple.com/il/app/paybox-pay-send-money/id966408400', '_blank');
-    }
-  }
 </script>
 </body>
 </html>
